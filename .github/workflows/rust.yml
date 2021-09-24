@@ -1,0 +1,52 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:      
+    - uses: actions/checkout@v2
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: nightly
+          override: true
+          components: rustfmt, clippy, rustc
+    # Setting up Docker Builder
+    - name: Set up Docker Builder
+      uses: docker/setup-buildx-action@v1
+      
+    - name: Run tests
+      run: cargo +nightly test --verbose
+    - name: Build Release
+      run: cargo +nightly build --verbose --release
+      
+    # Set Github Access Token with "write:packages" scope for Github Container Registry.
+    # Then go to repository setings and add the copied token as a secret called "CR_PAT"
+    # https://github.com/settings/tokens/new?scopes=repo,write:packages&description=Github+Container+Registry
+    - name: Log into GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.CR_PAT }}
+
+    # Push to Github Container Registry
+    - name: Push to Github Container Registry
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        version: latest
+        file: Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository }}:latest
