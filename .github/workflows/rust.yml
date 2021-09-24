@@ -21,7 +21,7 @@ jobs:
       with:
           toolchain: nightly
           override: true
-          components: rustfmt, clippy, rustc, rustdoc
+          components: rustfmt, clippy, rustc
     - uses: actions/checkout@v2
     - name: Build
       run: cargo +nightly build --verbose
