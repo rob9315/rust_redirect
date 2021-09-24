@@ -47,6 +47,6 @@ jobs:
       with:
         context: .
         version: latest
-        file: dockerfile
+        file: Dockerfile
         push: true
         tags: ghcr.io/${{ github.repository }}:latest
