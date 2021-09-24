@@ -1,4 +1,4 @@
 FROM alpine
 COPY target/release/rust_redirect rust_redirect
-EXPOSE 80/tcp
+HEALTHCHECK NONE
 CMD rust_redirect
